@@ -8,7 +8,7 @@ from mmcv.runner import (get_dist_info, init_dist, load_checkpoint,
                          wrap_fp16_model)
 from mmcv.utils import DictAction
 
-from mmseg.apis import multi_gpu_test, single_gpu_test
+from mmseg.apis import multi_gpu_test, single_gpu_test, single_gpu_cls_test
 from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.models import build_segmentor
 
@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument(
         '--aug-test', action='store_true', help='Use Flip and Multi scale aug')
     parser.add_argument(
-        '--down-test', action='store_false', help='Use Flip and Multi scale aug')
+        '--down-test', action='store_true', help='Use Flip and Multi scale aug')
     parser.add_argument(
         '--scale-ratio', type=float, help='Use Singe test with a speficy ratio')
     parser.add_argument('--out', help='output result file in pickle format')
@@ -63,7 +63,7 @@ def parse_args():
     parser.add_argument(
         '--opacity',
         type=float,
-        default=1.,
+        default=0.5,
         help='Opacity of painted segmentation map. In (0, 1] range.')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
@@ -98,13 +98,10 @@ def main():
         cfg.data.test.pipeline[1].img_ratios = [
             0.5, 0.75, 1.0, 1.25, 1.5, 1.75
         ]
-        cfg.data.test.pipeline[1].img_ratios = [
-            1.0,
-        ]
         cfg.data.test.pipeline[1].flip = True
     if args.down_test:
         cfg.data.test.pipeline[1].img_ratios = [
-            0.8,
+            args.scale_ratio, 
         ]
         cfg.data.test.pipeline[1].flip = False
     cfg.model.pretrained = None
@@ -151,7 +148,7 @@ def main():
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs = single_gpu_test(model, data_loader, args.show, args.show_dir,
+        outputs = single_gpu_cls_test(model, data_loader, args.show, args.show_dir,
                                   efficient_test, args.opacity)
     else:
         model = MMDistributedDataParallel(
@@ -170,7 +167,7 @@ def main():
         if args.format_only:
             dataset.format_results(outputs, **kwargs)
         if args.eval:
-            dataset.evaluate(outputs, args.eval, **kwargs)
+            dataset._evaluate_cls_accuracy(outputs, args.eval, **kwargs)
 
 
 if __name__ == '__main__':

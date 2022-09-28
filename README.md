@@ -1,145 +1,111 @@
-<div align="center">
-  <img src="resources/mmseg-logo.png" width="600"/>
-</div>
-<br />
+# ISDNet
 
-[![PyPI](https://img.shields.io/pypi/v/mmsegmentation)](https://pypi.org/project/mmsegmentation)
-[![docs](https://img.shields.io/badge/docs-latest-blue)](https://mmsegmentation.readthedocs.io/en/latest/)
-[![badge](https://github.com/open-mmlab/mmsegmentation/workflows/build/badge.svg)](https://github.com/open-mmlab/mmsegmentation/actions)
-[![codecov](https://codecov.io/gh/open-mmlab/mmsegmentation/branch/master/graph/badge.svg)](https://codecov.io/gh/open-mmlab/mmsegmentation)
-[![license](https://img.shields.io/github/license/open-mmlab/mmsegmentation.svg)](https://github.com/open-mmlab/mmsegmentation/blob/master/LICENSE)
-[![issue resolution](https://isitmaintained.com/badge/resolution/open-mmlab/mmsegmentation.svg)](https://github.com/open-mmlab/mmsegmentation/issues)
-[![open issues](https://isitmaintained.com/badge/open/open-mmlab/mmsegmentation.svg)](https://github.com/open-mmlab/mmsegmentation/issues)
+![teaser](resources/pipeline.png)
 
-Documentation: https://mmsegmentation.readthedocs.io/
+This repository will provide the code for the following paper:
 
-English | [简体中文](README_zh-CN.md)
+**ISDNet: Integrating Shallow and Deep Networks for Efficient Ultra-high Resolution Segmentation**<br>
+Accepted to CVPR2022
+Paper
+> **Abstract:** *The huge burden of computation and memory are two obstacles in ultra-high resolution image segmentation. To tackle these issues, most of the previous works follow the global-local refinement pipeline, which pays more attention to the memory consumption but neglects the inference speed. In comparison to the pipeline that partitions the large image into small local regions, we focus on inferring the whole image directly. In this paper, we propose ISDNet, a novel ultra-high resolution segmentation framework that integrates the shallow and deep networks in a new manner, which significantly accelerates the inference speed while achieving accurate segmentation. To further exploit the relationship between the shallow and deep features, we propose a novel Relational-Aware feature Fusion module, which ensures high performance and robustness of our framework. Extensive experiments on Deepglobe, Inria Aerial, and Cityscapes datasets demonstrate our performance is consistently superior to state-of-the-arts. Specifically, it achieves 73.30 mIoU with a speed of 27.70 FPS on Deepglobe, which is more accurate and 172x faster than the recent competitor.*
 
-## Introduction
-
-MMSegmentation is an open source semantic segmentation toolbox based on PyTorch.
-It is a part of the OpenMMLab project.
-
-The master branch works with **PyTorch 1.3+**.
-
-![demo image](resources/seg_demo.gif)
-
-### Major features
-
-- **Unified Benchmark**
-
-  We provide a unified benchmark toolbox for various semantic segmentation methods.
-
-- **Modular Design**
-
-  We decompose the semantic segmentation framework into different components and one can easily construct a customized semantic segmentation framework by combining different modules.
-
-- **Support of multiple methods out of box**
-
-  The toolbox directly supports popular and contemporary semantic segmentation frameworks, *e.g.* PSPNet, DeepLabV3, PSANet, DeepLabV3+, etc.
-
-- **High efficiency**
-
-  The training speed is faster than or comparable to other codebases.
-
-## License
-
-This project is released under the [Apache 2.0 license](LICENSE).
-
-## Changelog
-
-v0.16.0 was released in 08/04/2021.
-Please refer to [changelog.md](docs/changelog.md) for details and release history.
-
-## Benchmark and model zoo
-
-Results and models are available in the [model zoo](docs/model_zoo.md).
-
-Supported backbones:
-
-- [x] ResNet (CVPR'2016)
-- [x] ResNeXt (CVPR'2017)
-- [x] [HRNet (CVPR'2019)](configs/hrnet)
-- [x] [ResNeSt (ArXiv'2020)](configs/resnest)
-- [x] [MobileNetV2 (CVPR'2018)](configs/mobilenet_v2)
-- [x] [MobileNetV3 (ICCV'2019)](configs/mobilenet_v3)
-- [x] [Vision Transformer (ICLR'2021)](configs/vit)
-- [x] [Swin Transformer (arXiV'2021)](configs/swin)
-
-Supported methods:
-
-- [x] [FCN (CVPR'2015/TPAMI'2017)](configs/fcn)
-- [x] [UNet (MICCAI'2016/Nat. Methods'2019)](configs/unet)
-- [x] [PSPNet (CVPR'2017)](configs/pspnet)
-- [x] [DeepLabV3 (ArXiv'2017)](configs/deeplabv3)
-- [x] [Mixed Precision (FP16) Training (ArXiv'2017)](configs/fp16)
-- [x] [PSANet (ECCV'2018)](configs/psanet)
-- [x] [DeepLabV3+ (CVPR'2018)](configs/deeplabv3plus)
-- [x] [UPerNet (ECCV'2018)](configs/upernet)
-- [x] [NonLocal Net (CVPR'2018)](configs/nonlocal_net)
-- [x] [EncNet (CVPR'2018)](configs/encnet)
-- [x] [Semantic FPN (CVPR'2019)](configs/sem_fpn)
-- [x] [DANet (CVPR'2019)](configs/danet)
-- [x] [APCNet (CVPR'2019)](configs/apcnet)
-- [x] [EMANet (ICCV'2019)](configs/emanet)
-- [x] [CCNet (ICCV'2019)](configs/ccnet)
-- [x] [DMNet (ICCV'2019)](configs/dmnet)
-- [x] [ANN (ICCV'2019)](configs/ann)
-- [x] [GCNet (ICCVW'2019/TPAMI'2020)](configs/gcnet)
-- [x] [Fast-SCNN (ArXiv'2019)](configs/fastscnn)
-- [x] [OCRNet (ECCV'2020)](configs/ocrnet)
-- [x] [DNLNet (ECCV'2020)](configs/dnlnet)
-- [x] [PointRend (CVPR'2020)](configs/point_rend)
-- [x] [CGNet (TIP'2020)](configs/cgnet)
-- [x] [SETR (CVPR'2021)](configs/setr)
+# Code
+Our code is based on MMSegmentaion (version 0.16.0).
 
 ## Installation
+### Create a conda virtual environment and activate it (conda is optional)
+```
+conda create -n isdnet python=3.8 -y
+conda activate isdnet
+```
+### Install dependencies
+```
+# Install pytorch firstly, the cudatoolkit version should be same in your system.
+conda install pytorch==1.6.0 torchvision==0.7.0 cudatoolkit=10.1 -c pytorch
 
-Please refer to [get_started.md](docs/get_started.md#installation) for installation and [dataset_prepare.md](docs/dataset_prepare.md#prepare-datasets) for dataset preparation.
+# Or you can install via pip
+pip install torch==1.6.0 torchvision==0.7.0
 
-## Get Started
-
-Please see [train.md](docs/train.md) and [inference.md](docs/inference.md) for the basic usage of MMSegmentation.
-There are also tutorials for [customizing dataset](docs/tutorials/customize_datasets.md), [designing data pipeline](docs/tutorials/data_pipeline.md), [customizing modules](docs/tutorials/customize_models.md), and [customizing runtime](docs/tutorials/customize_runtime.md).
-We also provide many [training tricks](docs/tutorials/training_tricks.md).
-
-A Colab tutorial is also provided. You may preview the notebook [here](demo/MMSegmentation_Tutorial.ipynb) or directly [run](https://colab.research.google.com/github/open-mmlab/mmsegmentation/blob/master/demo/MMSegmentation_Tutorial.ipynb) on Colab.
-
-## Citation
-
-If you find this project useful in your research, please consider cite:
-
-```latex
-@misc{mmseg2020,
-    title={{MMSegmentation}: OpenMMLab Semantic Segmentation Toolbox and Benchmark},
-    author={MMSegmentation Contributors},
-    howpublished = {\url{https://github.com/open-mmlab/mmsegmentation}},
-    year={2020}
-}
+# Install
+python setup.py develop
+```
+## Datasets
+We follow [FCtL](https://github.com/liqiokkk/FCtL) to split dataset.
+### DeepGlobe
+Please register and download [DeepGlobe](https://competitions.codalab.org/competitions/18468) dataset.
+Create folder named 'root_path', its structure is  
+```
+    root_path/
+    ├── img_dir
+       ├── train
+          ├── xxx_sat.jpg
+          ├── ...
+       ├── val
+       ├── test
+    ├── rgb2id
+      ├── train
+          ├── xxx_mask.png(0-6)
+          ├── ...
+      ├── val
+      ├── test
 ```
 
-## Contributing
 
-We appreciate all contributions to improve MMSegmentation. Please refer to [CONTRIBUTING.md](.github/CONTRIBUTING.md) for the contributing guideline.
+### Inria Aerial
+Please register and download [Inria Aerial](https://project.inria.fr/aerialimagelabeling/) dataset. 
+Create folder named 'root_path', its structure is  
+```
+    root_path/
+    ├── imgs
+       ├── train
+          ├── xxx_sat.tif
+          ├── ...
+       ├── test
+       ├── val
+    ├── labels
+       ├── train
+          ├── xxx_mask.png(two values:0-1)
+          ├── ...
+       ├── test
+       ├── val
+```
 
-## Acknowledgement
+### Training
+DeepGlobe
+`./tools/dist_train.sh configs/isdnet/isdnet_1224x1224_80k_deepglobe.py 4`
 
-MMSegmentation is an open source project that welcome any contribution and feedback.
-We wish that the toolbox and benchmark could serve the growing research
-community by providing a flexible as well as standardized toolkit to reimplement existing methods
-and develop their own new semantic segmentation methods.
+Inria Aerial
+`./tools/dist_train.sh configs/isdnet/isdnet_1224x1224_80k_deepglobe.py 4`
 
-## Projects in OpenMMLab
+### Evaluation
+Accuracy:
+`python tools/test.py config_file checkpoints_file --eval mIoU`
 
-- [MMCV](https://github.com/open-mmlab/mmcv): OpenMMLab foundational library for computer vision.
-- [MMClassification](https://github.com/open-mmlab/mmclassification): OpenMMLab image classification toolbox and benchmark.
-- [MMDetection](https://github.com/open-mmlab/mmdetection): OpenMMLab detection toolbox and benchmark.
-- [MMDetection3D](https://github.com/open-mmlab/mmdetection3d): OpenMMLab's next-generation platform for general 3D object detection.
-- [MMSegmentation](https://github.com/open-mmlab/mmsegmentation): OpenMMLab semantic segmentation toolbox and benchmark.
-- [MMAction2](https://github.com/open-mmlab/mmaction2): OpenMMLab's next-generation action understanding toolbox and benchmark.
-- [MMTracking](https://github.com/open-mmlab/mmtracking): OpenMMLab video perception toolbox and benchmark.
-- [MMPose](https://github.com/open-mmlab/mmpose): OpenMMLab pose estimation toolbox and benchmark.
-- [MMEditing](https://github.com/open-mmlab/mmediting): OpenMMLab image and video editing toolbox.
-- [MMOCR](https://github.com/open-mmlab/mmocr): A Comprehensive Toolbox for Text Detection, Recognition and Understanding.
-- [MMGeneration](https://github.com/open-mmlab/mmgeneration): A powerful toolkit for generative models.
-- [MIM](https://github.com/open-mmlab/mim): MIM Installs OpenMMLab Packages.
+*Due to patent fillings, pre-trained models are temporarily unavailable.*
+
+FPS:
+`python tools/fps_test.py config_file --height height of the test image --width width of the test image`
+
+
+## Results
+### DeepGLobe
+| Class | urban | agriculture | rangeland |forest | water | barren | unknown |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+ IoU | 79.55 |88.21 |42.48 | 79.82 | 84.58 | 65.20 | - |
+
+### Inria Aerial
+| Class |  building  | background |
+| :---: | :---: | :---: |
+| IoU | 74.39 | 97.58 |
+
+
+## Citation
+If you use this code and our results for your research, please cite our paper.
+```
+@inproceedings{guo2022isdnet,
+  title={ISDNet: Integrating Shallow and Deep Networks for Efficient Ultra-High Resolution Segmentation},
+  author={Guo, Shaohua and Liu, Liang and Gan, Zhenye and Wang, Yabiao and Zhang, Wuhao and Wang, Chengjie and Jiang, Guannan and Zhang, Wei and Yi, Ran and Ma, Lizhuang and others},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={4361--4370},
+  year={2022}
+}

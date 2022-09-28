@@ -23,6 +23,17 @@ def parse_args():
     parser.add_argument(
         '--load-from', help='the checkpoint file to load weights from')
     parser.add_argument(
+        '--scratch-from', type=str, default=None, help='the deeplabv3 file to load weights from')
+    parser.add_argument(
+        '--fix', action='store_true', help='fix the parameters of heavy models such as deeplabv3'
+    )
+    parser.add_argument(
+        '--fix-name', type=str, default="refine", help='fix the parameters of heavy models such as deeplabv3'
+    )
+    parser.add_argument(
+        '--optim-name', type=str, default="SGD", help='fix the parameters of heavy models such as deeplabv3'
+    )
+    parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
@@ -132,9 +143,7 @@ def main():
         train_cfg=cfg.get('train_cfg'),
         test_cfg=cfg.get('test_cfg'))
     model.init_weights()
-
     logger.info(model)
-
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)
@@ -152,6 +161,46 @@ def main():
     model.CLASSES = datasets[0].CLASSES
     # passing checkpoint meta for saving best checkpoint
     meta.update(cfg.checkpoint_config.meta)
+    if args.scratch_from is not None:
+        # print(args.scratch_from)
+        pretrained_head = torch.load(args.scratch_from)['state_dict']
+        # 以下代码是用来测试原来的头部文件的是否正确的load
+        # for k, v in pretrained_head.items():
+        #     print(k)
+        # quit(0)
+        model.load_state_dict(pretrained_head, strict=False)
+    if args.fix is True:
+        # 用来将所有refine的参数都固定住
+        for name, param in model.named_parameters():
+            if args.fix_name not in name:
+                param.requires_grad = False
+
+    # for name, param in model.named_parameters():
+    #     print(name)
+    # quit(0)
+    # quit(0)
+    # print(type(model.parameters()))
+    # print(model.parameters())
+    # temp = torch.nn.parameter.Parameter(filter(lambda p: p.requires_grad, model.parameters()))
+    
+    # print(temp.parameters())
+    # quit(0)
+    
+    # for param in model.backbone.parameters():
+    #     print(param.requires_grad)
+    # quit(0)
+        # for k, v in pretrained_head.items():
+        #     if k == 'decode_head.aspp_modules.2.bn.bias':
+        #         print(v)
+        # print('-----------')
+        # model.load_state_dict(pretrained_head, strict=False)
+        # i = 0
+        # for k, v in model.state_dict().items():
+
+        #     if k == 'decode_head.aspp_modules.2.bn.bias':
+        #         print(v)
+        # print(pretrained_head)
+    
     train_segmentor(
         model,
         datasets,
@@ -159,7 +208,9 @@ def main():
         distributed=distributed,
         validate=(not args.no_validate),
         timestamp=timestamp,
-        meta=meta)
+        meta=meta,
+        fix=args.fix,
+        optim=args.optim_name)
 
 
 if __name__ == '__main__':

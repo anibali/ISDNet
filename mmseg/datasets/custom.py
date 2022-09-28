@@ -2,7 +2,7 @@ import os
 import os.path as osp
 from collections import OrderedDict
 from functools import reduce
-
+import torch
 import mmcv
 import numpy as np
 from mmcv.utils import print_log
@@ -334,6 +334,37 @@ class CustomDataset(Dataset):
                 reduce(np.union1d, [np.unique(_) for _ in gt_seg_maps]))
         else:
             num_classes = len(self.CLASSES)
+        # # # 分类准确度计算
+        # print(len(results))
+        # cls_preds = np.load('np_temp.npy')
+        # # print(cls_preds.shape)
+        # acc_list = []
+        # sum_list = []
+        # for i in range(len(results)):
+        #     cls_pred = torch.from_numpy(cls_preds[i])
+        #     # print(cls_pred.shape)
+        #     pred_label = torch.from_numpy(np.load(results[i]))
+        #     label = torch.from_numpy(mmcv.imread(gt_seg_maps[i], flag='unchanged', backend='pillow'))
+
+        #     mask = torch.zeros_like(label, device=label.device)
+        #     mask[pred_label == label] = 1.0
+
+        #     avg_acc = torch.mean(mask.float(), dim=(0, 1))
+        #     patch_acc = torch.nn.functional.adaptive_avg_pool2d(mask.float().unsqueeze(0), (8, 16))
+        #     pred_mask = torch.zeros_like(patch_acc, device=label.device)
+        #     # print(label.shape)
+        #     # print(avg_acc.shape)
+        #     # print(patch_acc.shape)
+        #     pred_mask[patch_acc < avg_acc] = 1.0
+
+        #     sum_pre = torch.zeros_like(patch_acc, device=label.device)
+        #     # #print(cls_pred[3: ].shape)
+        #     # print(pred_mask.shape)
+        #     sum_pre[cls_pred[0] == pred_mask] = 1.
+        #     acc_list.append(torch.mean(sum_pre.float()))
+        #     sum_list.append(torch.mean(cls_pred.float()))
+        # print(sum(acc_list)/len(acc_list))
+        # print(sum(sum_list)/len(sum_list))
         ret_metrics = eval_metrics(
             results,
             gt_seg_maps,
